@@ -1,0 +1,33 @@
+[project]
+name = "shopping-agent"
+version = "0.1.0"
+description = "Shopping agent with LlamaIndex"
+authors = [
+    {name = "User",email = "user@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "llama-index",
+    "llama-index-core",
+    "llama-index-llms-ollama",
+    "llama-index-llms-openai",
+    "llama-index-llms-anthropic",
+    "llama-index-agent-openai",
+    "selenium",
+    "webdriver-manager",
+    "pyautogui",
+    "opencv-python",
+    "beautifulsoup4",
+    "requests",
+    "playwright",
+    "pandas",
+    "numpy",
+    "nest-asyncio",
+    "langchain-ollama"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
