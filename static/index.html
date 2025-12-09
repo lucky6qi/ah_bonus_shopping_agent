@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AH 购物助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+        
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+        
+        .status.info {
+            background: #bee3f8;
+            color: #2c5282;
+            border: 1px solid #90cdf4;
+        }
+        
+        .buckets-preview {
+            margin-top: 20px;
+        }
+        
+        .bucket {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .bucket-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+        
+        .product-list {
+            list-style: none;
+        }
+        
+        .product-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-title {
+            font-weight: 500;
+            color: #2d3748;
+        }
+        
+        .product-price {
+            font-size: 12px;
+            color: #718096;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #718096;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 AH 购物助手</h1>
+            <p>智能购物清单生成工具</p>
+        </div>
+        
+        <div class="card">
+            <div id="status" class="status"></div>
+            
+            <div class="form-group">
+                <label for="prompt">购物需求：</label>
+                <textarea id="prompt" placeholder="例如：&#10;购物需求：&#10;购买一周的健康食材，包括肉类、蔬菜、水果和必需品。&#10;&#10;必须购买：&#10;2盒1L牛奶，10个鸡蛋，3种打折商品"></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-primary" onclick="scrapeProducts()">1. 爬取打折商品</button>
+                <button class="btn-secondary" onclick="generateBuckets()">2. 生成购物清单</button>
+                <button class="btn-danger" onclick="openCart()">3. 打开购物车页面</button>
+            </div>
+            
+            <div class="stats" id="stats" style="display: none; margin-top: 20px;">
+                <div class="stat-item">
+                    <div class="stat-value" id="productCount">0</div>
+                    <div class="stat-label">商品总数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="bucketCount">0</div>
+                    <div class="stat-label">分类数量</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" id="bucketsPreview" style="display: none;">
+            <h2>购物清单预览</h2>
+            <div id="bucketsContent"></div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = window.location.origin;
+        let currentBuckets = null;
+        
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.style.display = 'block';
+        }
+        
+        function hideStatus() {
+            document.getElementById('status').style.display = 'none';
+        }
+        
+        async function scrapeProducts() {
+            showStatus('正在爬取打折商品...', 'info');
+            try {
+                const response = await fetch(`${API_BASE}/api/scrape`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ use_cache: true })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showStatus(`✅ 成功爬取 ${data.count} 个商品${data.cached ? ' (使用缓存)' : ''}`, 'success');
+                    document.getElementById('productCount').textContent = data.count;
+                    document.getElementById('stats').style.display = 'flex';
+                } else {
+                    showStatus('❌ 爬取失败', 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ 错误: ${error.message}`, 'error');
+            }
+        }
+        
+        async function generateBuckets() {
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) {
+                showStatus('⚠️ 请输入购物需求', 'error');
+                return;
+            }
+            
+            showStatus('🤖 正在生成购物清单...', 'info');
+            try {
+                const response = await fetch(`${API_BASE}/api/generate-buckets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    currentBuckets = data.buckets;
+                    showStatus(`✅ ${data.message}`, 'success');
+                    displayBuckets(data.buckets);
+                    document.getElementById('bucketCount').textContent = Object.keys(data.buckets).length;
+                    document.getElementById('stats').style.display = 'flex';
+                } else {
+                    showStatus('❌ 生成失败', 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ 错误: ${error.message}`, 'error');
+            }
+        }
+        
+        function displayBuckets(buckets) {
+            const container = document.getElementById('bucketsContent');
+            container.innerHTML = '';
+            
+            const bucketNames = {
+                'essentials': '必需品',
+                'meat': '肉类',
+                'vegetables': '蔬菜',
+                'fruit': '水果',
+                'snacks': '零食',
+                'beverages': '饮料',
+                'other': '其他'
+            };
+            
+            for (const [bucketName, products] of Object.entries(buckets)) {
+                if (products.length === 0) continue;
+                
+                const bucketDiv = document.createElement('div');
+                bucketDiv.className = 'bucket';
+                
+                const title = document.createElement('div');
+                title.className = 'bucket-title';
+                title.textContent = `${bucketNames[bucketName] || bucketName} (${products.length} 件)`;
+                
+                const productList = document.createElement('ul');
+                productList.className = 'product-list';
+                
+                products.forEach(product => {
+                    const li = document.createElement('li');
+                    li.className = 'product-item';
+                    
+                    const info = document.createElement('div');
+                    info.className = 'product-info';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'product-title';
+                    title.textContent = product.title;
+                    
+                    const price = document.createElement('div');
+                    price.className = 'product-price';
+                    price.textContent = product.price || product.current_price || '';
+                    
+                    info.appendChild(title);
+                    info.appendChild(price);
+                    li.appendChild(info);
+                    productList.appendChild(li);
+                });
+                
+                bucketDiv.appendChild(title);
+                bucketDiv.appendChild(productList);
+                container.appendChild(bucketDiv);
+            }
+            
+            document.getElementById('bucketsPreview').style.display = 'block';
+        }
+        
+        function openCart() {
+            if (!currentBuckets) {
+                showStatus('⚠️ 请先生成购物清单', 'error');
+                return;
+            }
+            
+            // 将购物清单数据存储到 sessionStorage
+            sessionStorage.setItem('shoppingBuckets', JSON.stringify(currentBuckets));
+            
+            // 打开新窗口
+            const cartWindow = window.open('/cart', '_blank', 'width=1200,height=800');
+            
+            if (cartWindow) {
+                showStatus('✅ 购物车页面已打开', 'success');
+            } else {
+                showStatus('❌ 无法打开新窗口，请检查浏览器弹窗设置', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
+

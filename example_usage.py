@@ -3,7 +3,6 @@ import os
 import json
 from config import Config
 from scraper import AHBonusScraper
-from history import ShoppingHistory
 from bucket_generator import BucketGenerator
 from cart_automation import add_to_cart_simple, add_buckets_to_cart
 
@@ -27,19 +26,16 @@ def example_generate_buckets():
         return
     
     scraper = AHBonusScraper(config)
-    history = ShoppingHistory()
     generator = BucketGenerator(api_key)
     
     products = scraper.scrape_bonus_products()
-    recent_lists = history.get_recent_lists(10)
     
     user_prompt = """Shopping Requirements:
 Buy healthy ingredients for a week, including meat, vegetables, fruits"""
     
     buckets = generator.generate_buckets(
         products=products,
-        user_prompt=user_prompt,
-        recent_history=recent_lists
+        user_prompt=user_prompt
     )
     
     print(generator.format_buckets(buckets))

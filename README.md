@@ -1,12 +1,11 @@
 # AH Shopping Agent
 
-A shopping agent for scraping AH.nl bonus products, managing shopping history, and automating cart operations.
+A shopping agent for scraping AH.nl bonus products and automating cart operations.
 
 ## Features
 
 - 🕷️ Scrape discount products from ah.nl/bonus
 - 📊 Product summaries and categorization
-- 📋 Shopping history with search and statistics
 - 🤖 AI-powered product categorization
 - 🛒 Automated cart operations
 
@@ -41,12 +40,10 @@ uv run python main.py
 ```python
 from config import Config
 from scraper import AHBonusScraper
-from history import ShoppingHistory
 from bucket_generator import BucketGenerator
 
 config = Config.from_env()
 scraper = AHBonusScraper(config)
-history = ShoppingHistory()
 
 # Scrape products
 products = scraper.scrape_bonus_products()

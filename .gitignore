@@ -4,14 +4,19 @@ __pycache__/
 *$py.class
 *.so
 .Python
-*.egg-info/
-dist/
-build/
-
-# Virtual environments
-.venv/
+env/
 venv/
 ENV/
+.venv
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment
+.env
+.env.local
 
 # IDE
 .vscode/
@@ -19,19 +24,21 @@ ENV/
 *.swp
 *.swo
 
-# Data files
-shopping_history.json
-products_cache.json
-*.json.bak
-
-# Environment variables
-.env
-
-# Chrome/WebDriver
-chromedriver
-geckodriver
-
 # OS
 .DS_Store
 Thumbs.db
 
+# Uploads
+uploads/
+*.webm
+*.wav
+*.mp3
+
+# Logs
+*.log
+
+# Session/Cookie data (contains login information)
+.ah_shopping_agent/
+chrome_profile/
+login_state.json
+products_cache_*.json
